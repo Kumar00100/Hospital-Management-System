@@ -1,0 +1,89 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is behind 'origin/main' by 7 commits, and can be fast-forwarded.
+#   (use "git pull" to update your local branch)
+#
+# Changes to be committed:
+#	modified:   README.md
+#	new file:   server/.env
+#	new file:   server/config/database.js
+#	new file:   server/middleware/auth.js
+#	new file:   server/package.json
+#	new file:   server/routes/appointments.js
+#	new file:   server/routes/auth.js
+#	new file:   server/routes/departments.js
+#	new file:   server/routes/doctors.js
+#	new file:   server/routes/feedbacks.js
+#	new file:   server/routes/gallery.js
+#	new file:   server/routes/patients.js
+#	new file:   server/routes/prescriptions.js
+#	new file:   server/routes/users.js
+#	new file:   server/scripts/migrate.js
+#	new file:   server/server.js
+#
+# Changes not staged for commit:
+#	deleted:    README.md
+#	modified:   public/favicon.ico
+#	deleted:    server/.env
+#	deleted:    server/config/database.js
+#	deleted:    server/middleware/auth.js
+#	deleted:    server/package.json
+#	deleted:    server/routes/appointments.js
+#	deleted:    server/routes/auth.js
+#	deleted:    server/routes/departments.js
+#	deleted:    server/routes/doctors.js
+#	deleted:    server/routes/feedbacks.js
+#	deleted:    server/routes/gallery.js
+#	deleted:    server/routes/patients.js
+#	deleted:    server/routes/prescriptions.js
+#	deleted:    server/routes/users.js
+#	deleted:    server/scripts/migrate.js
+#	deleted:    server/server.js
+#	modified:   src/App.tsx
+#	modified:   src/components/AppointmentBooking.tsx
+#	modified:   src/components/HeroSlider.tsx
+#	modified:   src/components/Navigation.tsx
+#	modified:   src/components/TopBar.tsx
+#	modified:   src/index.css
+#	modified:   src/pages/Index.tsx
+#	modified:   vite.config.ts
+#
+# Untracked files:
+#	.vite/
+#	public/medical-favicon.svg
+#	public/medical-icon.svg
+#	src/components/Contact.tsx
+#	src/components/DashboardNavigation.tsx
+#	src/components/DoctorScheduleManagement.tsx
+#	src/components/FeedbackForm.tsx
+#	src/components/FeedbackList.tsx
+#	src/components/Gallery.tsx
+#	src/components/MedicalRecordForm.tsx
+#	src/components/ModernFooter.tsx
+#	src/components/ModernHeroSlider.tsx
+#	src/components/ModernNavigation.tsx
+#	src/components/ModernServices.tsx
+#	src/components/PatientProfile.tsx
+#	src/components/ProtectedRoute.tsx
+#	src/components/ReportsDashboard.tsx
+#	src/components/dashboard/
+#	src/contexts/
+#	src/data/
+#	src/hooks/useRoleRedirect.ts
+#	src/pages/AdminDashboard.tsx
+#	src/pages/AppointmentBookingPage.tsx
+#	src/pages/DashboardLinksPage.tsx
+#	src/pages/Departments.tsx
+#	src/pages/DoctorDashboard.tsx
+#	src/pages/PatientDashboard.tsx
+#	src/pages/RegisterUserDashboard.tsx
+#	src/pages/StaffDashboard.tsx
+#	src/pages/auth/
+#	src/pages/departments/
+#	src/routes/
+#	src/services/
+#	src/types/
+#
