@@ -136,10 +136,7 @@ const Cardiology = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => {
-                            console.log('Attempting navigation to:', `/doctors/${doctor.profileSlug}`);
-                            window.location.href = `http://localhost:3000/doctors/${doctor.profileSlug}`;
-                          }}
+                          onClick={() => navigate(`/doctors/${doctor.profileSlug}`)}
                         >
                           View Profile
                         </Button>

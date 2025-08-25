@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CalendarIcon, User, Mail, Lock, Phone, Calendar, MapPin, Heart, UserPlus } from 'lucide-react';
+import { Calendar, User, Mail, Lock, Phone, Heart, UserPlus, MapPin } from 'lucide-react';
 import apiService from '@/services/api';
 
 interface PatientFormData {
@@ -95,18 +94,18 @@ const PatientRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string) => {
     if (field.includes('.')) {
-        const [parent, child] = field.split('.');
-        setFormData(prev => ({
-            ...prev,
-            [parent]: {
-                ...(prev[parent as keyof PatientFormData] as object),
-                [child]: value
-            }
-        }));
+      const [parent, child] = field.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...(prev[parent as keyof PatientFormData] as object),
+          [child]: value
+        }
+      }));
     } else {
-        setFormData(prev => ({ ...prev, [field]: value }));
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
     
     // Clear error when user starts typing

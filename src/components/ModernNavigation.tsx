@@ -44,12 +44,12 @@ const ModernNavigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-5">
-            <a 
-              href="#home" 
+            <button 
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               Home
-            </a>
+            </button>
             
             <a 
               href="#about" 
@@ -168,7 +168,15 @@ const ModernNavigation = () => {
         {isOpen && (
           <div className="lg:hidden pb-6 bg-white border-t border-gray-100">
             <div className="flex flex-col space-y-1 pt-4">
-              <a href="#home" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">Home</a>
+              <button 
+                className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors text-left w-full"
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
+              >
+                Home
+              </button>
               <a href="#about" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">About Us</a>
               
               {/* Mobile Departments */}

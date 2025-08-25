@@ -19,12 +19,49 @@ const Gallery = () => {
         const data: GalleryItem[] = await res.json();
         setItems(data);
       } catch (e) {
-        // Fallback to static folder if API fails
-        const fallback = Array.from({ length: 8 }, (_, i) => ({
-          id: i + 1,
-          title: `Photo ${i + 1}`,
-          image_path: `/uploads/gallery/${i + 1}.jpg`
-        }));
+        // Fallback to AI-generated hospital images if API fails
+        const fallback = [
+          {
+            id: 1,
+            title: "Modern Hospital Reception",
+            image_path: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop"
+          },
+          {
+            id: 2,
+            title: "Advanced Operating Theater",
+            image_path: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=400&h=300&fit=crop"
+          },
+          {
+            id: 3,
+            title: "Emergency Department",
+            image_path: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop"
+          },
+          {
+            id: 4,
+            title: "Patient Room",
+            image_path: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&h=300&fit=crop"
+          },
+          {
+            id: 5,
+            title: "Medical Laboratory",
+            image_path: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=300&fit=crop"
+          },
+          {
+            id: 6,
+            title: "Radiology Department",
+            image_path: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&h=300&fit=crop"
+          },
+          {
+            id: 7,
+            title: "Pediatric Ward",
+            image_path: "https://images.unsplash.com/photo-1576765608535-5f04d336d7e2?w=400&h=300&fit=crop"
+          },
+          {
+            id: 8,
+            title: "Hospital Exterior",
+            image_path: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400&h=300&fit=crop"
+          }
+        ];
         setItems(fallback);
       }
     };

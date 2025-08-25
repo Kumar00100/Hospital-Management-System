@@ -54,7 +54,14 @@ const Navigation = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuLink href="#home" className="font-medium hover:text-primary">
+                  <NavigationMenuLink 
+                    href="#home" 
+                    className="font-medium hover:text-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
                     Home
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -188,9 +195,29 @@ const Navigation = () => {
         {isOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-2">
-              <a href="#home" className="p-2 hover:bg-accent rounded">Home</a>
+              <a 
+                href="#home" 
+                className="p-2 hover:bg-accent rounded"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setIsOpen(false);
+                }}
+              >
+                Home
+              </a>
               <a href="#about" className="p-2 hover:bg-accent rounded">About Us</a>
-              <a href="#departments" className="p-2 hover:bg-accent rounded">Departments</a>
+              <a 
+                href="/departments" 
+                className="p-2 hover:bg-accent rounded"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/departments');
+                  setIsOpen(false);
+                }}
+              >
+                Departments
+              </a>
               <a href="#doctors" className="p-2 hover:bg-accent rounded">Doctors</a>
               <a href="#services" className="p-2 hover:bg-accent rounded">Services</a>
               <a href="#testimonials" className="p-2 hover:bg-accent rounded">Testimonials</a>
