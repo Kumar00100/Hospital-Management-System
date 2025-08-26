@@ -76,6 +76,10 @@ class ApiService {
     return this.request('/users');
   }
 
+  async getRecentRegistrations() {
+    return this.request('/users/recent');
+  }
+
   async getUserById(id: string) {
     return this.request(`/users/${id}`);
   }
@@ -83,6 +87,13 @@ class ApiService {
   async deleteUser(id: string) {
     return this.request(`/users/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async updateUser(id: string, userData: any) {
+    return this.request(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
     });
   }
 

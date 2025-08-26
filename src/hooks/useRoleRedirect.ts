@@ -7,9 +7,31 @@ export const useRoleRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Role Redirect - isAuthenticated:', isAuthenticated, 'user:', user); // Debug log
     if (isAuthenticated && user) {
-      // Redirect all users to homepage after login
-      navigate('/');
+      // Add a small delay to ensure authentication state is fully updated
+      // before navigating, so the navigation component shows correct buttons
+      const timer = setTimeout(() => {
+        // Redirect users to their respective dashboards based on role
+        switch (user.role) {
+          case 'admin':
+            navigate('/admin/dashboard');
+            break;
+          case 'doctor':
+            navigate('/doctor/dashboard');
+            break;
+          case 'staff':
+            navigate('/staff/dashboard');
+            break;
+          case 'patient':
+            navigate('/patient/dashboard');
+            break;
+          default:
+            navigate('/');
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, user, navigate]);
 

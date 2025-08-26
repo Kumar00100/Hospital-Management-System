@@ -152,7 +152,9 @@ const PatientDashboard = () => {
             <Card>
               <CardHeader className="flex justify-between items-center">
                 <CardTitle>My Appointments</CardTitle>
-                <Button>Book New Appointment</Button>
+                <Button onClick={() => window.location.href = '/appointment'}>
+                  Book New Appointment
+                </Button>
               </CardHeader>
               <CardContent>
                 <Table>

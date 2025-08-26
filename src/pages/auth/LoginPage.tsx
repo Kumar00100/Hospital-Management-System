@@ -32,7 +32,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ role, title, description }
     try {
       const success = await login(email, password, role);
       if (success) {
-        // Navigation will be handled by useRoleRedirect
+        console.log('Login successful, redirecting to home...');
+        navigate('/'); // ✅ Redirect all users to home page
       } else {
         setError('Invalid credentials or role mismatch');
       }

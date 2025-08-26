@@ -8,6 +8,8 @@ interface BackendUser {
   name: string;
   email: string;
   role: UserRole;
+  registrationNumber: string;
+  mobile: string;
 }
 
 interface LoginResponse {
@@ -130,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const loginData = response.data as LoginResponse;
         const { token, user: userData } = loginData;
         
-        console.log('✅ Login successful for:', userData.name);
+        console.log('✅ Login successful for:', userData.name, 'with role:', userData.role);
         
         // Store token
         localStorage.setItem('hms-token', token);

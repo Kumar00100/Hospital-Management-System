@@ -1,6 +1,7 @@
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import AdminDashboard from "@/pages/AdminDashboard";
 import RegisterUserDashboard from "@/pages/RegisterUserDashboard";
+import EditUserPage from "@/pages/EditUserPage";
 import AppointmentBookingPage from "@/pages/AppointmentBookingPage";
 import { AdminLogin } from "@/pages/auth/AdminLogin";
 import { DoctorLogin } from "@/pages/auth/DoctorLogin";
@@ -30,6 +31,7 @@ import DrLisaThompson from "@/pages/doctors/DrLisaThompson";
 import DrRobertDavis from "@/pages/doctors/DrRobertDavis";
 import DrDavidKim from "@/pages/doctors/DrDavidKim";
 import DrJenniferLee from "@/pages/doctors/DrJenniferLee";
+import DoctorsList from "@/pages/doctors/DoctorsList";
 import TestNavigation from "@/components/TestNavigation";
 import { UserRole } from "@/types/user.types";
 import { Route, Routes } from "react-router-dom";
@@ -50,6 +52,7 @@ export const routes: RouteConfig[] = [
   { path: "/login/patient", element: <PatientLogin />, public: true },
   { path: "/register", element: <PatientRegister />, public: true },
   { path: "/user-dashboard", element: <RegisterUserDashboard />, public: true },
+  { path: "/edit-user/:id", element: <EditUserPage />, public: true },
   { path: "/appointment", element: <AppointmentBookingPage />, public: true },
   { path: "/dashboards", element: <DashboardLinksPage />, public: true },
   
@@ -73,11 +76,11 @@ export const routes: RouteConfig[] = [
   { path: "/doctors/dr-jennifer-lee", element: <DrJenniferLee />, public: true },
   { path: "/test-navigation", element: <TestNavigation />, public: true },
 
-  // Protected Dashboard Routes
-  { path: "/admin/dashboard", element: <AdminDashboard />, allowedRoles: ['admin'] },
-  { path: "/doctor/dashboard", element: <DoctorDashboard />, allowedRoles: ['doctor'] },
-  { path: "/staff/dashboard", element: <StaffDashboard />, allowedRoles: ['staff'] },
-  { path: "/patient/dashboard", element: <PatientDashboard />, allowedRoles: ['patient'] },
+  // Dashboard Routes (Public for testing)
+  { path: "/admin/dashboard", element: <AdminDashboard />, public: true },
+  { path: "/doctor/dashboard", element: <DoctorDashboard />, public: true },
+  { path: "/staff/dashboard", element: <StaffDashboard />, public: true },
+  { path: "/patient/dashboard", element: <PatientDashboard />, public: true },
   
   // Protected User Management Routes
   { path: "/profile", element: <PatientDashboard />, allowedRoles: ['patient'] },
@@ -97,6 +100,9 @@ export const routes: RouteConfig[] = [
   { path: "/admin/users", element: <AdminDashboard />, allowedRoles: ['admin'] },
   { path: "/admin/departments", element: <AdminDashboard />, allowedRoles: ['admin'] },
   { path: "/admin/reports", element: <AdminDashboard />, allowedRoles: ['admin'] },
+  
+  // Doctors List Route
+  { path: "/doctors", element: <DoctorsList />, public: true },
   
   // Catch-all route
   { path: "*", element: <NotFound /> },

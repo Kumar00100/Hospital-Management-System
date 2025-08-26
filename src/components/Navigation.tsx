@@ -86,28 +86,33 @@ const Navigation = () => {
                         </NavigationMenuLink>
                       ))} */}
                       {departments.map((dept) => (
-                            <NavigationMenuLink
-                              asChild
-                              key={dept.name}
-                            >
-                              <button
-                                onClick={() => {
-                                  setIsOpen(false); // close mobile menu if open
-                                  navigate(`/departments/${dept.href}`);
-                                }}
-                                className="block p-3 rounded-md hover:bg-accent transition-colors text-left w-full"
-                              >
-                                <div className="font-medium">{dept.name}</div>
-                              </button>
-                            </NavigationMenuLink>
-                          ))}
+                        <NavigationMenuLink
+                          asChild
+                          key={dept.name}
+                        >
+                          <Link
+                            to={`/departments/${dept.href}`}
+                            className="block p-3 rounded-md hover:bg-accent transition-colors text-left w-full"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            <div className="font-medium">{dept.name}</div>
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
                           
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuLink href="#doctors" className="font-medium hover:text-primary">
+                  <NavigationMenuLink 
+                    href="/doctors" 
+                    className="font-medium hover:text-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/doctors');
+                    }}
+                  >
                     Doctors
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -141,6 +146,14 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -207,18 +220,32 @@ const Navigation = () => {
                 Home
               </a>
               <a href="#about" className="p-2 hover:bg-accent rounded">About Us</a>
+              <div className="p-2 font-medium">Departments</div>
+              {departments.map((dept) => (
+                <a 
+                  key={dept.name}
+                  href={`/departments/${dept.href}`}
+                  className="pl-6 p-2 hover:bg-accent rounded text-sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/departments/${dept.href}`);
+                    setIsOpen(false);
+                  }}
+                >
+                  {dept.name}
+                </a>
+              ))}
               <a 
-                href="/departments" 
+                href="/doctors" 
                 className="p-2 hover:bg-accent rounded"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate('/departments');
+                  navigate('/doctors');
                   setIsOpen(false);
                 }}
               >
-                Departments
+                Doctors
               </a>
-              <a href="#doctors" className="p-2 hover:bg-accent rounded">Doctors</a>
               <a href="#services" className="p-2 hover:bg-accent rounded">Services</a>
               <a href="#testimonials" className="p-2 hover:bg-accent rounded">Testimonials</a>
               <a href="/dashboards" className="p-2 hover:bg-accent rounded">Dashboards</a>
@@ -226,6 +253,13 @@ const Navigation = () => {
               <div className="flex flex-col space-y-2 pt-4">
                 {isAuthenticated ? (
                   <>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/profile')}
+                    >
+                      Profile
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm"

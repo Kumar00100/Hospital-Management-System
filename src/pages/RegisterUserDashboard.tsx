@@ -142,21 +142,35 @@ const RegisterUserDashboard = () => {
   };
 
   const handleViewUser = (user: User) => {
-    // Navigate to user details page or show modal
+    // Navigate to appropriate dashboard based on user role
     console.log('View user:', user);
-    // For now, show an alert with user details
-    alert(`User Details:\nName: ${user.name}\nEmail: ${user.email}\nRole: ${user.role}\nStatus: ${user.status}`);
+    
+    if (user.role === 'patient') {
+      // Redirect to patient dashboard
+      window.location.href = 'http://localhost:5173/patient/dashboard';
+    } else if (user.role === 'doctor') {
+      // Redirect to doctor dashboard
+      window.location.href = 'http://localhost:5173/doctor/dashboard';
+    } else if (user.role === 'staff') {
+      // Redirect to staff dashboard
+      window.location.href = 'http://localhost:5173/staff/dashboard';
+    } else if (user.role === 'admin') {
+      // Redirect to admin dashboard
+      window.location.href = 'http://localhost:5173/admin/dashboard';
+    } else {
+      // Fallback: show user details
+      alert(`User Details:\nName: ${user.name}\nEmail: ${user.email}\nRole: ${user.role}\nStatus: ${user.status}`);
+    }
   };
 
   const handleEditUser = (user: User) => {
     // Navigate to edit user page
     console.log('Edit user:', user);
-    // For now, show an alert
-    alert(`Edit user: ${user.name} (ID: ${user.id})`);
+    navigate(`/edit-user/${user.id}`);
   };
 
   const handleDeleteUser = async (user: User) => {
-    if (!window.confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
+    if (!window.confirm(`Are you sure you want to permanently delete ${user.name}? This action cannot be undone and all user data will be lost.`)) {
       return;
     }
 
@@ -169,10 +183,27 @@ const RegisterUserDashboard = () => {
 
       // Remove the user from the local state
       setUsers(users.filter(u => u.id !== user.id));
-      alert(`User ${user.name} has been deleted successfully.`);
+      
+      // Show success message using the existing error message system
+      setErrorMessage(`User ${user.name} has been permanently deleted successfully.`);
+      setTimeout(() => setErrorMessage(null), 5000);
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user. Please try again.');
+      
+      // Handle specific error types similar to fetchUsers
+      if (error instanceof Error) {
+        if (error.message.includes('Network error')) {
+          setErrorMessage('Network error: Unable to connect to the server. Please check if the backend is running on port 3000.');
+        } else if (error.message.includes('Access denied') || error.message.includes('token')) {
+          setErrorMessage('Authentication required. Please login first to delete users.');
+        } else if (error.message.includes('permissions')) {
+          setErrorMessage('Insufficient permissions. You need admin access to delete users.');
+        } else {
+          setErrorMessage(`Failed to delete user: ${error.message}`);
+        }
+      } else {
+        setErrorMessage('Failed to delete user. Please check your network connection and try again.');
+      }
     }
   };
 

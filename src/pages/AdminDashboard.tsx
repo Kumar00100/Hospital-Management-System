@@ -27,6 +27,26 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import apiService from '@/services/api';
+
+interface Appointment {
+  id: string;
+  patient_name: string;
+  doctor_name: string;
+  department_name: string;
+  date: string;
+  time: string;
+  status: string;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  createdAt: string;
+}
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -40,19 +60,59 @@ const AdminDashboard = () => {
     activeUsers: 156
   });
 
-  const [recentAppointments, setRecentAppointments] = useState([
-    { id: 1, patient: 'John Doe', doctor: 'Dr. Sarah Johnson', department: 'Cardiology', date: '2024-01-15', time: '10:00 AM', status: 'confirmed' },
-    { id: 2, patient: 'Jane Smith', doctor: 'Dr. Michael Chen', department: 'Neurology', date: '2024-01-15', time: '11:30 AM', status: 'pending' },
-    { id: 3, patient: 'Bob Wilson', doctor: 'Dr. Emily Rodriguez', department: 'Orthopedics', date: '2024-01-15', time: '02:00 PM', status: 'completed' },
-    { id: 4, patient: 'Alice Brown', doctor: 'Dr. James Wilson', department: 'Pediatrics', date: '2024-01-15', time: '03:30 PM', status: 'cancelled' }
-  ]);
-
+  const [recentAppointments, setRecentAppointments] = useState<Appointment[]>([]);
+  const [recentRegistrations, setRecentRegistrations] = useState<User[]>([]);
   const [topDepartments, setTopDepartments] = useState([
     { name: 'Cardiology', appointments: 156, revenue: 45000, growth: '+12%' },
     { name: 'Neurology', appointments: 134, revenue: 38000, growth: '+8%' },
     { name: 'Orthopedics', appointments: 98, revenue: 28000, growth: '+15%' },
     { name: 'Pediatrics', appointments: 87, revenue: 22000, growth: '+5%' }
   ]);
+
+  useEffect(() => {
+    const fetchRecentAppointments = async () => {
+      try {
+        const response = await apiService.getAppointments();
+        if (response.data) {
+          // Get the latest 5 appointments, sorted by date and time
+          const sortedAppointments = (response.data as any[])
+            .sort((a, b) => new Date(b.date + ' ' + b.time).getTime() - new Date(a.date + ' ' + a.time).getTime())
+            .slice(0, 5);
+          setRecentAppointments(sortedAppointments);
+        }
+      } catch (error) {
+        console.error('Error fetching recent appointments:', error);
+        // Fallback to mock data if API fails
+        setRecentAppointments([
+          { id: '1', patient_name: 'John Doe', doctor_name: 'Dr. Sarah Johnson', department_name: 'Cardiology', date: '2024-01-15', time: '10:00 AM', status: 'confirmed' },
+          { id: '2', patient_name: 'Jane Smith', doctor_name: 'Dr. Michael Chen', department_name: 'Neurology', date: '2024-01-15', time: '11:30 AM', status: 'pending' },
+          { id: '3', patient_name: 'Bob Wilson', doctor_name: 'Dr. Emily Rodriguez', department_name: 'Orthopedics', date: '2024-01-15', time: '02:00 PM', status: 'completed' },
+          { id: '4', patient_name: 'Alice Brown', doctor_name: 'Dr. James Wilson', department_name: 'Pediatrics', date: '2024-01-15', time: '03:30 PM', status: 'cancelled' }
+        ]);
+      }
+    };
+
+    const fetchRecentRegistrations = async () => {
+      try {
+        const response = await apiService.getRecentRegistrations();
+        if (response.data) {
+          setRecentRegistrations(response.data as User[]);
+        }
+      } catch (error) {
+        console.error('Error fetching recent registrations:', error);
+        // Fallback to mock data if API fails
+        setRecentRegistrations([
+          { id: 1, name: 'John Doe', email: 'john@example.com', role: 'patient', status: 'active', createdAt: '2024-01-15T10:00:00Z' },
+          { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'doctor', status: 'active', createdAt: '2024-01-15T09:30:00Z' },
+          { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'staff', status: 'active', createdAt: '2024-01-15T08:45:00Z' },
+          { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'patient', status: 'active', createdAt: '2024-01-14T16:20:00Z' }
+        ]);
+      }
+    };
+
+    fetchRecentAppointments();
+    fetchRecentRegistrations();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -159,9 +219,9 @@ const AdminDashboard = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Recent Appointments */}
-              <Card>
+              <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Appointments
@@ -175,12 +235,12 @@ const AdminDashboard = () => {
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8">
                             <AvatarFallback className="text-xs">
-                              {appointment.patient.split(' ').map(n => n[0]).join('')}
+                              {appointment.patient_name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-sm">{appointment.patient}</p>
-                            <p className="text-xs text-gray-500">{appointment.doctor}</p>
+                            <p className="font-medium text-sm">{appointment.patient_name}</p>
+                            <p className="text-xs text-gray-500">{appointment.doctor_name}</p>
                           </div>
                         </div>
                         <div className="text-right">
@@ -196,15 +256,61 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* Recent Registrations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      Recent Registrations
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.location.href = '/user-dashboard'}
+                      >
+                        View All
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {recentRegistrations.slice(0, 3).map((user) => (
+                        <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-xs">
+                                {user.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-sm">{user.name}</p>
+                              <p className="text-xs text-gray-500">{user.email}</p>
+                              <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500">
+                              {new Date(user.createdAt).toLocaleDateString()}
+                            </p>
+                            <Badge className={`text-xs ${
+                              user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {user.status === 'active' ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
               {/* Top Departments */}
-              <Card>
+              <Card className="lg:col-span-3">
                 <CardHeader>
                   <CardTitle>Top Performing Departments</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {topDepartments.map((dept, index) => (
-                      <div key={dept.name} className="flex items-center justify-between">
+                      <div key={dept.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
                             index === 0 ? 'bg-yellow-500' : 
@@ -271,9 +377,9 @@ const AdminDashboard = () => {
                   <TableBody>
                     {recentAppointments.map((appointment) => (
                       <TableRow key={appointment.id}>
-                        <TableCell className="font-medium">{appointment.patient}</TableCell>
-                        <TableCell>{appointment.doctor}</TableCell>
-                        <TableCell>{appointment.department}</TableCell>
+                        <TableCell className="font-medium">{appointment.patient_name}</TableCell>
+                        <TableCell>{appointment.doctor_name}</TableCell>
+                        <TableCell>{appointment.department_name}</TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">{appointment.date}</p>

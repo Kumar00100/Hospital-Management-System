@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 const dashboards = [
   {
     role: "Admin",
-    path: "/login/admin",
+    path: "/admin/dashboard",
     icon: Shield,
     description: "Full system control.",
   },

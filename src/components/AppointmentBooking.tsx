@@ -13,7 +13,7 @@ import apiService from '@/services/api';
 
 interface AppointmentFormData {
   name: string;
-  age: string;
+  age: number | string;
   gender: string;
   mobile: string;
   department: string;
@@ -22,10 +22,13 @@ interface AppointmentFormData {
   time: string;
   symptoms: string;
   notifyDoctor: boolean;
+  registrationNumber: string;
 }
 
 const AppointmentBooking = () => {
   const { user } = useAuth();
+  console.log('User:', user); // Log user information
+  console.log('User mobile number:', user?.mobile); // Log mobile number
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [departments, setDepartments] = useState<any[]>([]);
@@ -38,10 +41,11 @@ const AppointmentBooking = () => {
   ];
   
   const [formData, setFormData] = useState<AppointmentFormData>({
+    registrationNumber: user?.registrationNumber || "", // Initialize registration number
     name: user?.name || "",
     age: "",
     gender: "",
-    mobile: "", // Phone will be entered by user since it's not in BackendUser
+    mobile: user?.mobile || "", // Use user's mobile number from AuthContext
     department: "",
     doctor: "",
     date: "",
@@ -49,6 +53,18 @@ const AppointmentBooking = () => {
     symptoms: "",
     notifyDoctor: false,
   });
+
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || "",
+        mobile: user.mobile || "",
+        registrationNumber: user.registrationNumber || ""
+      }));
+    }
+  }, [user]);
 
   // Load departments and doctors on component mount
   useEffect(() => {
@@ -62,9 +78,48 @@ const AppointmentBooking = () => {
         
         if (deptResponse.data) {
           console.log('Departments data:', deptResponse.data);
-          setDepartments(deptResponse.data as any[]);
+          console.log('Number of departments:', (deptResponse.data as any[]).length);
+          if ((deptResponse.data as any[]).length === 0) {
+            console.warn('No departments found in the database');
+            // Add mock departments as fallback
+            const mockDepartments = [
+              { id: 1, name: 'Cardiology' },
+              { id: 2, name: 'Neurology' },
+              { id: 3, name: 'Orthopedics' },
+              { id: 4, name: 'Pediatrics' },
+              { id: 5, name: 'Dental' },
+              { id: 6, name: 'Surgery' },
+              { id: 7, name: 'Ophthalmology' },
+              { id: 8, name: 'ENT' },
+              { id: 9, name: 'Dermatology' },
+              { id: 10, name: 'Gynecology' }
+            ];
+            setDepartments(mockDepartments);
+          } else {
+            setDepartments(deptResponse.data as any[]);
+          }
         } else if (deptResponse.error) {
           console.error('Departments API error:', deptResponse.error);
+          // Add mock departments as fallback
+          const mockDepartments = [
+            { id: 1, name: 'Cardiology' },
+            { id: 2, name: 'Neurology' },
+            { id: 3, name: 'Orthopedics' },
+            { id: 4, name: 'Pediatrics' },
+            { id: 5, name: 'Dental' },
+            { id: 6, name: 'Surgery' },
+            { id: 7, name: 'Ophthalmology' },
+            { id: 8, name: 'ENT' },
+            { id: 9, name: 'Dermatology' },
+            { id: 10, name: 'Gynecology' }
+          ];
+          setDepartments(mockDepartments);
+          // Show error toast to user
+          toast({
+            title: "Using demo departments",
+            description: "Could not connect to server. Using demo department list.",
+            variant: "default"
+          });
         }
 
         // Load doctors
@@ -73,32 +128,136 @@ const AppointmentBooking = () => {
         
         if (docResponse.data) {
           console.log('Doctors data:', docResponse.data);
-          setDoctors(docResponse.data as any[]);
+          console.log('Number of doctors:', (docResponse.data as any[]).length);
+          if ((docResponse.data as any[]).length === 0) {
+            console.warn('No doctors found in the database');
+            // Add mock doctors as fallback
+            const mockDoctors = [
+              { id: 1, name: 'Dr. Sarah Smith', department_name: 'Cardiology' },
+              { id: 2, name: 'Dr. Michael Johnson', department_name: 'Neurology' },
+              { id: 3, name: 'Dr. Emily Rodriguez', department_name: 'Orthopedics' },
+              { id: 4, name: 'Dr. James Wilson', department_name: 'Pediatrics' },
+              { id: 5, name: 'Dr. Lisa Thompson', department_name: 'Dental' },
+              { id: 6, name: 'Dr. Robert Davis', department_name: 'Surgery' },
+              { id: 7, name: 'Dr. Jennifer Lee', department_name: 'Ophthalmology' },
+              { id: 8, name: 'Dr. David Kim', department_name: 'ENT' },
+              { id: 9, name: 'Dr. Sarah Johnson', department_name: 'Dermatology' },
+              { id: 10, name: 'Dr. Michael Chen', department_name: 'Gynecology' }
+            ];
+            setDoctors(mockDoctors);
+          } else {
+            setDoctors(docResponse.data as any[]);
+          }
         } else if (docResponse.error) {
           console.error('Doctors API error:', docResponse.error);
+          // Add mock doctors as fallback
+          const mockDoctors = [
+            { id: 1, name: 'Dr. Sarah Smith', department_name: 'Cardiology' },
+            { id: 2, name: 'Dr. Michael Johnson', department_name: 'Neurology' },
+            { id: 3, name: 'Dr. Emily Rodriguez', department_name: 'Orthopedics' },
+            { id: 4, name: 'Dr. James Wilson', department_name: 'Pediatrics' },
+            { id: 5, name: 'Dr. Lisa Thompson', department_name: 'Dental' },
+            { id: 6, name: 'Dr. Robert Davis', department_name: 'Surgery' },
+            { id: 7, name: 'Dr. Jennifer Lee', department_name: 'Ophthalmology' },
+            { id: 8, name: 'Dr. David Kim', department_name: 'ENT' },
+            { id: 9, name: 'Dr. Sarah Johnson', department_name: 'Dermatology' },
+            { id: 10, name: 'Dr. Michael Chen', department_name: 'Gynecology' }
+          ];
+          setDoctors(mockDoctors);
         }
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    };
+        } catch (error) {
+          console.error('Error loading data:', error);
+          // Add mock departments as fallback
+          const mockDepartments = [
+            { id: 1, name: 'Cardiology' },
+            { id: 2, name: 'Neurology' },
+            { id: 3, name: 'Orthopedics' },
+            { id: 4, name: 'Pediatrics' },
+            { id: 5, name: 'Dental' },
+            { id: 6, name: 'Surgery' },
+            { id: 7, name: 'Ophthalmology' },
+            { id: 8, name: 'ENT' },
+            { id: 9, name: 'Dermatology' },
+            { id: 10, name: 'Gynecology' }
+          ];
+          setDepartments(mockDepartments);
+          
+          // Add mock doctors as fallback
+          const mockDoctors = [
+            { id: 1, name: 'Dr. Sarah Smith', department_name: 'Cardiology' },
+            { id: 2, name: 'Dr. Michael Johnson', department_name: 'Neurology' },
+            { id: 3, name: 'Dr. Emily Rodriguez', department_name: 'Orthopedics' },
+            { id: 4, name: 'Dr. James Wilson', department_name: 'Pediatrics' },
+            { id: 5, name: 'Dr. Lisa Thompson', department_name: 'Dental' },
+            { id: 6, name: 'Dr. Robert Davis', department_name: 'Surgery' },
+            { id: 7, name: 'Dr. Jennifer Lee', department_name: 'Ophthalmology' },
+            { id: 8, name: 'Dr. David Kim', department_name: 'ENT' },
+            { id: 9, name: 'Dr. Sarah Johnson', department_name: 'Dermatology' },
+            { id: 10, name: 'Dr. Michael Chen', department_name: 'Gynecology' }
+          ];
+          setDoctors(mockDoctors);
+          
+          toast({
+            title: "Connection Error",
+            description: "Unable to connect to the server. Using demo data.",
+            variant: "default"
+          });
+        }
+      };
 
-    loadData();
-  }, []);
+      loadData();
+    }, []);
 
   // Filter doctors by selected department
   const filteredDoctors = doctors.filter(doctor => 
     !formData.department || doctor.department_name === formData.department
   );
 
+  // Debug logging for filtered doctors
+  useEffect(() => {
+    console.log('Filtered doctors:', filteredDoctors);
+    console.log('Selected department:', formData.department);
+    console.log('All doctors:', doctors);
+    console.log('First doctor department field:', doctors[0] ? doctors[0].department_name : 'No doctors loaded');
+  }, [formData.department, doctors, filteredDoctors]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Basic validation
-    if (!formData.name || !formData.department || !formData.doctor || !formData.date || !formData.time) {
+    // Check if user is authenticated
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to book an appointment.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      // Redirect to login page
+      window.location.href = '/login';
+      return;
+    }
+
+    // Enhanced validation
+    const requiredFields = ['name', 'department', 'doctor', 'date', 'time', 'mobile'];
+    const missingFields = requiredFields.filter(field => !formData[field as keyof AppointmentFormData]);
+    
+    if (missingFields.length > 0) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: `Please fill in all required fields: ${missingFields.join(', ')}`,
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate mobile number format
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(formData.mobile)) {
+      toast({
+        title: "Invalid Mobile Number",
+        description: "Please enter a valid 10-digit mobile number.",
         variant: "destructive"
       });
       setIsSubmitting(false);
@@ -116,7 +275,7 @@ const AppointmentBooking = () => {
 
       // Create appointment using API service
       const appointmentData = {
-        patient_id: user?.id, // Use logged-in user's ID
+        patient_id: user.id, // Use logged-in user's ID
         doctor_id: selectedDoctor.id,
         department_id: selectedDepartment.id,
         date: formData.date,
@@ -125,7 +284,10 @@ const AppointmentBooking = () => {
         status: 'pending'
       };
 
+      console.log('Sending appointment data:', appointmentData);
+
       const response = await apiService.createAppointment(appointmentData);
+      console.log('API Response:', response); // Log the API response
 
       if (response.error) {
         throw new Error(response.error);
@@ -133,12 +295,12 @@ const AppointmentBooking = () => {
 
       toast({
         title: "Appointment Booked Successfully! 🎉",
-        description: `Your appointment with ${formData.doctor} on ${formData.date} has been confirmed. You will receive a confirmation call shortly.`,
+        description: `Your appointment with ${formData.doctor} on ${formData.date} at ${formData.time} has been confirmed. You will receive a confirmation call shortly.`,
       });
 
       // Reset form
       setFormData({
-        name: user?.name || "",
+        name: user.name || "",
         age: "",
         gender: "",
         mobile: "",
@@ -148,12 +310,19 @@ const AppointmentBooking = () => {
         time: "",
         symptoms: "",
         notifyDoctor: false,
+        registrationNumber: user.registrationNumber || "",
       });
+
+      // Redirect to home page after 3 seconds to allow user to see the success message
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 3000);
+
     } catch (error) {
       console.error('Appointment booking error:', error);
       toast({
         title: "Could not book appointment",
-        description: error instanceof Error ? error.message : "Please try again or login to continue.",
+        description: error instanceof Error ? error.message : "Please try again or contact support.",
         variant: "destructive"
       });
     } finally {
@@ -177,6 +346,44 @@ const AppointmentBooking = () => {
           Please provide your details to schedule your appointment
         </p>
       </div>
+
+      {/* Login Notice for unauthenticated users */}
+      {!user && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">Login Required</h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>You need to be logged in to book an appointment. Please <a href="/login" className="font-medium underline text-yellow-800 hover:text-yellow-900">login here</a> or <a href="/register" className="font-medium underline text-yellow-800 hover:text-yellow-900">create an account</a>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Welcome message for authenticated users */}
+      {user && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-green-800">Welcome, {user.name}!</h3>
+              <div className="mt-2 text-sm text-green-700">
+                <p>You are logged in and ready to book your appointment. Your information has been pre-filled for convenience.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Personal Information Card */}
@@ -249,7 +456,23 @@ const AppointmentBooking = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
                   placeholder="Your mobile number"
                   required
-                  disabled={!!user}
+                  // disabled={!!user}
+                  className="bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Registration Number */}
+              <div className="space-y-2">
+                <Label htmlFor="registrationNumber" className="text-sm font-medium flex items-center">
+                  <UserCheck className="w-4 h-4 mr-2" />
+                  Registration Number
+                </Label>
+                <Input
+                  id="registrationNumber"
+                  value={formData.registrationNumber}
+                  onChange={(e) => setFormData(prev => ({ ...prev, registrationNumber: e.target.value }))}
+                  placeholder="Your registration number"
+                  // disabled={!!user}
                   className="bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
@@ -273,6 +496,8 @@ const AppointmentBooking = () => {
                 <Select 
                   value={formData.department} 
                   onValueChange={(value) => {
+                    console.log('Department selected:', value);
+                    console.log('Current departments state:', departments);
                     setFormData(prev => ({ ...prev, department: value }));
                     // Reset doctor when department changes
                     setFormData(prev => ({ ...prev, doctor: "" }));
@@ -282,9 +507,13 @@ const AppointmentBooking = () => {
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
-                    ))}
+                    {departments.length > 0 ? (
+                      departments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.name}>{dept.name}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>Loading departments...</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -301,9 +530,13 @@ const AppointmentBooking = () => {
                     <SelectValue placeholder="Select doctor" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filteredDoctors.map((doctor) => (
-                      <SelectItem key={doctor.id} value={doctor.name}>{doctor.name}</SelectItem>
-                    ))}
+                    {doctors.length > 0 ? (
+                      filteredDoctors.map((doctor) => (
+                        <SelectItem key={doctor.id} value={doctor.name}>{doctor.name}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>Loading doctors...</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

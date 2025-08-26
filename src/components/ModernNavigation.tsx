@@ -1,28 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, UserPlus, LogIn, Calendar, Heart, ChevronDown } from "lucide-react";
+import { Menu, X, UserPlus, LogIn, Calendar, Heart, ChevronDown, User, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ModernNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDepartmentsOpen, setIsDepartmentsOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
-  // Simple departments list
+  // Departments list with proper href values
   const departments = [
-    "Cardiology",
-    "Neurology", 
-    "Orthopedics",
-    "Pediatrics",
-    "Dental",
-    "Ophthalmology",
-    "ENT",
-    "Surgery"
+    { name: "Cardiology", href: "cardiology" },
+    { name: "Neurology", href: "neurology" },
+    { name: "Orthopedics", href: "orthopedics" },
+    { name: "Pediatrics", href: "pediatrics" },
+    { name: "Dental", href: "dental" },
+    { name: "Ophthalmology", href: "ophthalmology" },
+    { name: "ENT", href: "ent" },
+    { name: "Surgery", href: "surgery" }
   ];
 
-  const handleDepartmentClick = (dept: string) => {
+  const handleDepartmentClick = (deptHref: string) => {
     setIsDepartmentsOpen(false);
-    navigate(`/departments/${dept.toLowerCase()}`);
+    navigate(`/departments/${deptHref}`);
   };
 
   return (
@@ -44,15 +46,15 @@ const ModernNavigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-5">
-            <button 
+            <button
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               Home
             </button>
-            
-            <a 
-              href="#about" 
+
+            <a
+              href="#about"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
             >
               About Us
@@ -60,62 +62,66 @@ const ModernNavigation = () => {
 
             {/* Departments Dropdown */}
             <div className="relative">
+
               <button
                 onClick={() => setIsDepartmentsOpen(!isDepartmentsOpen)}
-                onBlur={() => setTimeout(() => setIsDepartmentsOpen(false), 150)}
                 className="font-semibold text-gray-700 hover:text-blue-600 bg-transparent hover:bg-blue-50 px-2 py-2 rounded-lg border-0 flex items-center space-x-1"
               >
                 <span>Departments</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${isDepartmentsOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {isDepartmentsOpen && (
                 <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                   <div className="py-2">
                     {departments.map((dept) => (
                       <button
-                        key={dept}
-                        onClick={() => handleDepartmentClick(dept)}
+                        key={dept.href}
+                        onClick={() => {
+                          handleDepartmentClick(dept.href);
+                          setIsDepartmentsOpen(false);
+                        }}
                         className="block w-full text-left px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                       >
-                        {dept}
+                        {dept.name}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
+
             </div>
 
-            <a 
-              href="#doctors" 
+            <a
+              href="#doctors"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
             >
               Doctors
             </a>
 
-            <a 
-              href="#services" 
+            <a
+              href="#services"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
             >
               Services
             </a>
 
-            <a 
-              href="#gallery" 
+            <a
+              href="#gallery"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-2 py-2 rounded-lg hover:bg-blue-50"
             >
               Gallery
             </a>
 
-            <a 
-              href="#testimonials" 
+            <a
+              href="#testimonials"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-blue-50"
             >
               Testimonials
             </a>
 
-            <a 
-              href="#contact" 
+            <a
+              href="#contact"
               className="font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-blue-50"
             >
               Contact
@@ -124,31 +130,63 @@ const ModernNavigation = () => {
 
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate('/login/patient')}
-              className="font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Login
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/register')}
-              className="border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Register
-            </Button>
-            <Button 
-              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-              onClick={() => navigate('/appointment')}
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Book Appointment
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                  className="font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={logout}
+                  className="border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                  onClick={() => navigate('/appointment')}
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book Appointment
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/login/patient')}
+                  className="font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Login
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/register')}
+                  className="border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Register
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                  onClick={() => navigate('/appointment')}
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book Appointment
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -168,7 +206,7 @@ const ModernNavigation = () => {
         {isOpen && (
           <div className="lg:hidden pb-6 bg-white border-t border-gray-100">
             <div className="flex flex-col space-y-1 pt-4">
-              <button 
+              <button
                 className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors text-left w-full"
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -178,56 +216,88 @@ const ModernNavigation = () => {
                 Home
               </button>
               <a href="#about" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">About Us</a>
-              
+
               {/* Mobile Departments */}
               <div className="px-4 py-3">
                 <div className="text-gray-700 font-medium mb-2">Departments</div>
                 <div className="flex flex-col space-y-1">
                   {departments.map((dept) => (
-                    <button 
-                      key={dept}
+                    <button
+                      key={dept.href}
                       onClick={() => {
                         setIsOpen(false);
-                        handleDepartmentClick(dept);
+                        handleDepartmentClick(dept.href);
                       }}
                       className="px-4 py-2 text-left text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
-                      {dept}
+                      {dept.name}
                     </button>
                   ))}
                 </div>
               </div>
-              
+
               <a href="#doctors" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">Doctors</a>
               <a href="#services" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">Services</a>
               <a href="#contact" className="px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors">Contact</a>
-              
+
               <div className="flex flex-col space-y-2 pt-4 px-4">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate('/login/patient')}
-                  className="justify-center"
-                >
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Login
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate('/register')}
-                  className="justify-center border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Register
-                </Button>
-                <Button 
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white justify-center"
-                  onClick={() => navigate('/appointment')}
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book Appointment
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/profile')}
+                      className="justify-center"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={logout}
+                      className="justify-center border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                    <Button
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white justify-center"
+                      onClick={() => navigate('/appointment')}
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Book Appointment
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/login/patient')}
+                      className="justify-center"
+                    >
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Login
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/register')}
+                      className="justify-center border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Register
+                    </Button>
+                    <Button
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white justify-center"
+                      onClick={() => navigate('/appointment')}
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Book Appointment
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
