@@ -167,12 +167,12 @@ const PatientRegister = () => {
         
         localStorage.setItem('currentUser', JSON.stringify(userData));
         
-        // Redirect directly to patient dashboard
-        navigate('/patient/dashboard', { 
-          state: { 
-            message: 'Registration successful! Welcome to your dashboard.',
+        // Redirect to home page
+        navigate('/', {
+          state: {
+            message: 'Registration successful! Welcome to our healthcare system.',
             user: userData
-          } 
+          }
         });
       }
     } catch (error) {

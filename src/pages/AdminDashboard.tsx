@@ -25,9 +25,11 @@ import {
   Activity,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  RefreshCw
 } from 'lucide-react';
 import apiService from '@/services/api';
+import { useAppointments } from '@/contexts/AppointmentsContext';
 
 interface Appointment {
   id: string;
@@ -60,7 +62,7 @@ const AdminDashboard = () => {
     activeUsers: 156
   });
 
-  const [recentAppointments, setRecentAppointments] = useState<Appointment[]>([]);
+  const { appointments, fetchAppointments } = useAppointments();
   const [recentRegistrations, setRecentRegistrations] = useState<User[]>([]);
   const [topDepartments, setTopDepartments] = useState([
     { name: 'Cardiology', appointments: 156, revenue: 45000, growth: '+12%' },
@@ -69,48 +71,34 @@ const AdminDashboard = () => {
     { name: 'Pediatrics', appointments: 87, revenue: 22000, growth: '+5%' }
   ]);
 
+  // Get the latest 5 appointments, sorted by date and time
+  const recentAppointments = appointments
+    .sort((a, b) => {
+      const dateA = new Date(a.date + 'T' + a.time);
+      const dateB = new Date(b.date + 'T' + b.time);
+      return dateB.getTime() - dateA.getTime();
+    })
+    .slice(0, 5);
+
+  const fetchRecentRegistrations = async () => {
+    try {
+      const response = await apiService.getRecentRegistrations();
+      if (response.data) {
+        setRecentRegistrations(response.data as User[]);
+      }
+    } catch (error) {
+      console.error('Error fetching recent registrations:', error);
+      // Fallback to mock data if API fails
+      setRecentRegistrations([
+        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'patient', status: 'active', createdAt: '2024-01-15T10:00:00Z' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'doctor', status: 'active', createdAt: '2024-01-15T09:30:00Z' },
+        { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'staff', status: 'active', createdAt: '2024-01-15T08:45:00Z' },
+        { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'patient', status: 'active', createdAt: '2024-01-14T16:20:00Z' }
+      ]);
+    }
+  };
+
   useEffect(() => {
-    const fetchRecentAppointments = async () => {
-      try {
-        const response = await apiService.getAppointments();
-        if (response.data) {
-          // Get the latest 5 appointments, sorted by date and time
-          const sortedAppointments = (response.data as any[])
-            .sort((a, b) => new Date(b.date + ' ' + b.time).getTime() - new Date(a.date + ' ' + a.time).getTime())
-            .slice(0, 5);
-          setRecentAppointments(sortedAppointments);
-        }
-      } catch (error) {
-        console.error('Error fetching recent appointments:', error);
-        // Fallback to mock data if API fails
-        setRecentAppointments([
-          { id: '1', patient_name: 'John Doe', doctor_name: 'Dr. Sarah Johnson', department_name: 'Cardiology', date: '2024-01-15', time: '10:00 AM', status: 'confirmed' },
-          { id: '2', patient_name: 'Jane Smith', doctor_name: 'Dr. Michael Chen', department_name: 'Neurology', date: '2024-01-15', time: '11:30 AM', status: 'pending' },
-          { id: '3', patient_name: 'Bob Wilson', doctor_name: 'Dr. Emily Rodriguez', department_name: 'Orthopedics', date: '2024-01-15', time: '02:00 PM', status: 'completed' },
-          { id: '4', patient_name: 'Alice Brown', doctor_name: 'Dr. James Wilson', department_name: 'Pediatrics', date: '2024-01-15', time: '03:30 PM', status: 'cancelled' }
-        ]);
-      }
-    };
-
-    const fetchRecentRegistrations = async () => {
-      try {
-        const response = await apiService.getRecentRegistrations();
-        if (response.data) {
-          setRecentRegistrations(response.data as User[]);
-        }
-      } catch (error) {
-        console.error('Error fetching recent registrations:', error);
-        // Fallback to mock data if API fails
-        setRecentRegistrations([
-          { id: 1, name: 'John Doe', email: 'john@example.com', role: 'patient', status: 'active', createdAt: '2024-01-15T10:00:00Z' },
-          { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'doctor', status: 'active', createdAt: '2024-01-15T09:30:00Z' },
-          { id: 3, name: 'Bob Wilson', email: 'bob@example.com', role: 'staff', status: 'active', createdAt: '2024-01-15T08:45:00Z' },
-          { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'patient', status: 'active', createdAt: '2024-01-14T16:20:00Z' }
-        ]);
-      }
-    };
-
-    fetchRecentAppointments();
     fetchRecentRegistrations();
   }, []);
 
@@ -225,7 +213,18 @@ const AdminDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Appointments
-                    <Button variant="outline" size="sm">View All</Button>
+                    <div className="flex items-center space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={fetchAppointments}
+                        className="flex items-center"
+                      >
+                        <RefreshCw className="w-4 h-4 mr-1" />
+                        Refresh
+                      </Button>
+                      <Button variant="outline" size="sm">View All</Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

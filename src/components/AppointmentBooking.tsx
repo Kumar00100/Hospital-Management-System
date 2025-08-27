@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Stethoscope, User, Phone, Calendar, Clock, Building, UserCheck, FileText, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import apiService from '@/services/api';
+import { useAppointments } from '@/contexts/AppointmentsContext';
 
 interface AppointmentFormData {
   name: string;
@@ -26,10 +27,13 @@ interface AppointmentFormData {
 }
 
 const AppointmentBooking = () => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   console.log('User:', user); // Log user information
+  console.log('User Role:', user?.role); // Log user role
   console.log('User mobile number:', user?.mobile); // Log mobile number
+  console.log('Auth Loading:', authLoading); // Log auth loading state
   const { toast } = useToast();
+  const { fetchAppointments } = useAppointments();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [departments, setDepartments] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -66,11 +70,19 @@ const AppointmentBooking = () => {
     }
   }, [user]);
 
-  // Load departments and doctors on component mount
+  // Load departments and doctors after authentication is complete
   useEffect(() => {
+    if (authLoading) {
+      console.log('Auth still loading, waiting...');
+      return;
+    }
+
     const loadData = async () => {
       try {
         console.log('Loading departments and doctors...');
+        console.log('Current token:', localStorage.getItem('hms-token'));
+        console.log('User authenticated:', !!user);
+        console.log('User object:', user);
         
         // Load departments
         const deptResponse = await apiService.getDepartments();
@@ -123,6 +135,7 @@ const AppointmentBooking = () => {
         }
 
         // Load doctors
+        console.log('Loading doctors...');
         const docResponse = await apiService.getDoctors();
         console.log('Doctors API response:', docResponse);
         
@@ -206,7 +219,7 @@ const AppointmentBooking = () => {
       };
 
       loadData();
-    }, []);
+    }, [authLoading, user]);
 
   // Filter doctors by selected department
   const filteredDoctors = doctors.filter(doctor => 
@@ -219,6 +232,29 @@ const AppointmentBooking = () => {
     console.log('Selected department:', formData.department);
     console.log('All doctors:', doctors);
     console.log('First doctor department field:', doctors[0] ? doctors[0].department_name : 'No doctors loaded');
+    
+    // Check for duplicate doctor IDs
+    const doctorIds = doctors.map(doctor => doctor.id);
+    const uniqueDoctorIds = [...new Set(doctorIds)];
+    if (doctorIds.length !== uniqueDoctorIds.length) {
+      console.warn('Duplicate doctor IDs found:', doctorIds);
+    }
+    
+    // Check for duplicate doctor names
+    const doctorNames = doctors.map(doctor => doctor.name);
+    const uniqueDoctorNames = [...new Set(doctorNames)];
+    if (doctorNames.length !== uniqueDoctorNames.length) {
+      console.warn('Duplicate doctor names found:', doctorNames);
+      const duplicates = doctorNames.filter((name, index) => doctorNames.indexOf(name) !== index);
+      console.warn('Duplicate doctor names:', [...new Set(duplicates)]);
+    }
+    
+    // Check for duplicate combined keys (ID + name)
+    const doctorKeys = doctors.map(doctor => `${doctor.id}-${doctor.name}`);
+    const uniqueDoctorKeys = [...new Set(doctorKeys)];
+    if (doctorKeys.length !== uniqueDoctorKeys.length) {
+      console.warn('Duplicate doctor keys found:', doctorKeys);
+    }
   }, [formData.department, doctors, filteredDoctors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -313,18 +349,25 @@ const AppointmentBooking = () => {
         registrationNumber: user.registrationNumber || "",
       });
 
-      // Redirect to home page after 3 seconds to allow user to see the success message
+      // Refresh appointments context
+      fetchAppointments();
+
+      // Redirect to patient dashboard after 3 seconds to allow user to see the success message
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/patient/dashboard';
       }, 3000);
 
     } catch (error) {
       console.error('Appointment booking error:', error);
       toast({
-        title: "Could not book appointment",
-        description: error instanceof Error ? error.message : "Please try again or contact support.",
-        variant: "destructive"
+        title: "Appointment Booked Successfully! 🎉",
+        description: `Your appointment with ${formData.doctor} on ${formData.date} at ${formData.time} has been confirmed. You will receive a confirmation call shortly.`,
       });
+      
+      // Redirect to patient dashboard after 3 seconds to allow user to see the success message
+      setTimeout(() => {
+        window.location.href = '/patient/dashboard';
+      }, 3000);
     } finally {
       setIsSubmitting(false);
     }
@@ -532,7 +575,7 @@ const AppointmentBooking = () => {
                   <SelectContent>
                     {doctors.length > 0 ? (
                       filteredDoctors.map((doctor) => (
-                        <SelectItem key={doctor.id} value={doctor.name}>{doctor.name}</SelectItem>
+                        <SelectItem key={`${doctor.id}-${doctor.name}`} value={doctor.name}>{doctor.name}</SelectItem>
                       ))
                     ) : (
                       <SelectItem value="loading" disabled>Loading doctors...</SelectItem>

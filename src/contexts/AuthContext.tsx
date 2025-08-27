@@ -135,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('✅ Login successful for:', userData.name, 'with role:', userData.role);
         
         // Store token
+        console.log('Storing token:', token);
         localStorage.setItem('hms-token', token);
         
         // Set session timeout

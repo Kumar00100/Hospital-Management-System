@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3001/api'; // Updated to use the correct port
 
 interface ApiResponse<T> {
   data?: T;
@@ -25,6 +25,7 @@ class ApiService {
       };
 
       console.log(`API Request: ${options.method || 'GET'} ${url}`);
+      console.log('Token available:', !!token);
       
       const response = await fetch(url, config);
       const data = await response.json();
@@ -126,6 +127,10 @@ class ApiService {
 
   async getPatientById(id: string) {
     return this.request(`/patients/${id}`);
+  }
+
+  async getPatientByUserId(userId: string) {
+    return this.request(`/patients/user/${userId}`);
   }
 
   async getPatientsByDoctor(doctorId: string) {

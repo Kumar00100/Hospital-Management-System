@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import apiService from "@/services/api";
 
 type GalleryItem = {
   id: number;
@@ -14,10 +15,13 @@ const Gallery = () => {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await fetch('/api/gallery');
-        if (!res.ok) throw new Error('Failed to load gallery');
-        const data: GalleryItem[] = await res.json();
-        setItems(data);
+        const response = await apiService.getGallery();
+        if (response.data) {
+          setItems(response.data as GalleryItem[]);
+        } else if (response.error) {
+          console.error('Gallery API error:', response.error);
+          throw new Error(response.error);
+        }
       } catch (e) {
         // Fallback to AI-generated hospital images if API fails
         const fallback = [
